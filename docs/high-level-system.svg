@@ -1,10 +1,10 @@
-<svg width="1600" height="840" viewBox="0 0 1600 840" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="1600" height="820" viewBox="0 0 1600 820" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="titleGradient" x1="350" y1="24" x2="1250" y2="98" gradientUnits="userSpaceOnUse">
+    <linearGradient id="titleGradient" x1="360" y1="24" x2="1240" y2="98" gradientUnits="userSpaceOnUse">
       <stop stop-color="#0F172A"/>
       <stop offset="1" stop-color="#1E293B"/>
     </linearGradient>
-    <linearGradient id="pagesGradient" x1="1315" y1="615" x2="1520" y2="715" gradientUnits="userSpaceOnUse">
+    <linearGradient id="pagesGradient" x1="1390" y1="665" x2="1530" y2="749" gradientUnits="userSpaceOnUse">
       <stop stop-color="#9A3412"/>
       <stop offset="1" stop-color="#EA580C"/>
     </linearGradient>
@@ -75,101 +75,89 @@
     </style>
   </defs>
 
-  <rect width="1600" height="840" fill="#FFFFFF"/>
+  <rect width="1600" height="820" fill="#FFFFFF"/>
 
-  <rect x="350" y="24" width="900" height="74" rx="24" fill="url(#titleGradient)" filter="url(#shadow)"/>
+  <rect x="360" y="24" width="880" height="74" rx="24" fill="url(#titleGradient)" filter="url(#shadow)"/>
   <text x="800" y="58" text-anchor="middle" class="title">Fake News Benchmark</text>
-  <text x="800" y="79" text-anchor="middle" class="subtitle">High-level system from acquisition to public viewer</text>
+  <text x="800" y="79" text-anchor="middle" class="subtitle">Fetch, perturb, evaluate, publish</text>
 
-  <rect x="40" y="140" width="300" height="660" rx="28" fill="#F8FBFF" stroke="#D4E6F8" stroke-width="2"/>
-  <rect x="370" y="140" width="640" height="660" rx="28" fill="#F0FDFA" stroke="#A7F3D0" stroke-width="2"/>
-  <rect x="1040" y="140" width="520" height="660" rx="28" fill="#FFF7ED" stroke="#FED7AA" stroke-width="2"/>
+  <rect x="40" y="140" width="260" height="620" rx="28" fill="#F8FBFF" stroke="#D4E6F8" stroke-width="2"/>
+  <rect x="330" y="140" width="840" height="620" rx="28" fill="#ECFDF5" stroke="#6EE7B7" stroke-width="2"/>
+  <rect x="1200" y="140" width="360" height="620" rx="28" fill="#FFF7ED" stroke="#FED7AA" stroke-width="2"/>
 
-  <rect x="60" y="165" width="165" height="32" rx="16" fill="#0F172A"/>
-  <rect x="390" y="165" width="180" height="32" rx="16" fill="#0F766E"/>
-  <rect x="1060" y="165" width="190" height="32" rx="16" fill="#9A3412"/>
+  <rect x="60" y="165" width="170" height="32" rx="16" fill="#0F172A"/>
+  <rect x="350" y="165" width="220" height="32" rx="16" fill="#0F766E"/>
+  <rect x="1220" y="165" width="200" height="32" rx="16" fill="#9A3412"/>
 
-  <text x="142.5" y="185" text-anchor="middle" class="pill">Inputs &amp; Control</text>
-  <text x="480" y="185" text-anchor="middle" class="pill">Benchmark Core</text>
-  <text x="1155" y="185" text-anchor="middle" class="pill">Storage &amp; Delivery</text>
+  <text x="145" y="185" text-anchor="middle" class="pill">Inputs &amp; Control</text>
+  <text x="460" y="185" text-anchor="middle" class="pill">Benchmark Core</text>
+  <text x="1320" y="185" text-anchor="middle" class="pill">Storage &amp; Delivery</text>
 
-  <rect x="70" y="235" width="240" height="110" rx="20" fill="#FFFFFF" stroke="#93C5FD" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="70" y="385" width="240" height="92" rx="20" fill="#FFFFFF" stroke="#99F6E4" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="70" y="515" width="240" height="110" rx="20" fill="#FFFFFF" stroke="#99F6E4" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="70" y="240" width="220" height="108" rx="20" fill="#FFFFFF" stroke="#93C5FD" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="70" y="390" width="220" height="88" rx="20" fill="#FFFFFF" stroke="#99F6E4" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="70" y="510" width="220" height="88" rx="20" fill="#FFFFFF" stroke="#99F6E4" stroke-width="2" filter="url(#shadow)"/>
 
-  <rect x="560" y="225" width="260" height="86" rx="20" fill="url(#titleGradient)" filter="url(#shadow)"/>
-  <rect x="460" y="315" width="220" height="92" rx="20" fill="#FFFFFF" stroke="#38BDF8" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="460" y="425" width="220" height="92" rx="20" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="460" y="535" width="220" height="92" rx="20" fill="#FFFFFF" stroke="#14B8A6" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="460" y="645" width="220" height="92" rx="20" fill="#FFFFFF" stroke="#2DD4BF" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="730" y="530" width="240" height="110" rx="20" fill="#FFFBEB" stroke="#F59E0B" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="500" y="220" width="500" height="92" rx="20" fill="url(#titleGradient)" filter="url(#shadow)"/>
+  <rect x="360" y="395" width="170" height="94" rx="20" fill="#FFFFFF" stroke="#38BDF8" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="560" y="395" width="180" height="94" rx="20" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="770" y="383" width="190" height="118" rx="20" fill="#FFFFFF" stroke="#14B8A6" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="990" y="395" width="150" height="94" rx="20" fill="#FFFFFF" stroke="#2DD4BF" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="770" y="545" width="190" height="94" rx="20" fill="#FFFBEB" stroke="#F59E0B" stroke-width="2" filter="url(#shadow)"/>
 
-  <rect x="1070" y="255" width="205" height="95" rx="20" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="1325" y="255" width="195" height="95" rx="20" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="1070" y="430" width="450" height="110" rx="20" fill="#FFFFFF" stroke="#FB923C" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="1070" y="615" width="205" height="100" rx="20" fill="#FFFFFF" stroke="#FDBA74" stroke-width="2" filter="url(#shadow)"/>
-  <rect x="1315" y="615" width="205" height="100" rx="20" fill="url(#pagesGradient)" filter="url(#shadow)"/>
+  <rect x="1230" y="395" width="300" height="94" rx="20" fill="#FFFFFF" stroke="#94A3B8" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="1230" y="540" width="300" height="100" rx="20" fill="#FFFFFF" stroke="#FB923C" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="1230" y="665" width="140" height="84" rx="20" fill="#FFFFFF" stroke="#FDBA74" stroke-width="2" filter="url(#shadow)"/>
+  <rect x="1390" y="665" width="140" height="84" rx="20" fill="url(#pagesGradient)" filter="url(#shadow)"/>
 
-  <text x="190" y="274" text-anchor="middle" class="card-title">Trusted News Sources</text>
-  <text x="190" y="301" text-anchor="middle" class="card-body">Reuters, AP, NPR, BBC,</text>
-  <text x="190" y="321" text-anchor="middle" class="card-body">Guardian, Al Jazeera</text>
+  <text x="180" y="278" text-anchor="middle" class="card-title">News Sources</text>
+  <text x="180" y="305" text-anchor="middle" class="card-body">Reuters, AP, BBC, NPR, ...</text>
 
-  <text x="190" y="420" text-anchor="middle" class="card-title">Daily Scheduler</text>
-  <text x="190" y="447" text-anchor="middle" class="card-body">scheduled benchmark runs</text>
+  <text x="180" y="425" text-anchor="middle" class="card-title">Daily Scheduler</text>
+  <text x="180" y="452" text-anchor="middle" class="card-body">daily benchmark runs</text>
 
-  <text x="190" y="554" text-anchor="middle" class="card-title">Manual Run Scripts</text>
-  <text x="190" y="581" text-anchor="middle" class="card-body">run_end_to_end.sh</text>
-  <text x="190" y="601" text-anchor="middle" class="card-body">run_benchmark_once.py</text>
+  <text x="180" y="545" text-anchor="middle" class="card-title">Manual Run</text>
+  <text x="180" y="572" text-anchor="middle" class="card-body">CLI and scripts</text>
 
-  <text x="690" y="261" text-anchor="middle" class="dark-title">Benchmark Orchestrator</text>
-  <text x="690" y="286" text-anchor="middle" class="dark-body">coordinates the end-to-end run</text>
+  <text x="750" y="258" text-anchor="middle" class="dark-title">Benchmark Orchestrator</text>
+  <text x="750" y="284" text-anchor="middle" class="dark-body">runs fetch -&gt; perturb -&gt; evaluate</text>
 
-  <text x="570" y="350" text-anchor="middle" class="card-title">News Fetcher</text>
-  <text x="570" y="377" text-anchor="middle" class="card-body">pulls and deduplicates live stories</text>
+  <text x="445" y="430" text-anchor="middle" class="card-title">News Fetcher</text>
+  <text x="445" y="457" text-anchor="middle" class="card-body">fetch + dedupe</text>
 
-  <text x="570" y="460" text-anchor="middle" class="card-title">Fake-Variant Generator</text>
-  <text x="570" y="487" text-anchor="middle" class="card-body">injects subtle entity, date,</text>
-  <text x="570" y="507" text-anchor="middle" class="card-body">or location changes</text>
+  <text x="650" y="430" text-anchor="middle" class="card-title">Variant Generator</text>
+  <text x="650" y="457" text-anchor="middle" class="card-body">inject one false claim</text>
 
-  <text x="570" y="570" text-anchor="middle" class="card-title">Search-Grounded Models</text>
-  <text x="570" y="597" text-anchor="middle" class="card-body">verify and repair the manipulated article</text>
+  <text x="865" y="429" text-anchor="middle" class="card-title">Search Models</text>
+  <text x="865" y="456" text-anchor="middle" class="card-body">search, verify, repair</text>
 
-  <text x="570" y="680" text-anchor="middle" class="card-title">Scoring &amp; Evaluation</text>
-  <text x="570" y="707" text-anchor="middle" class="card-body">surface alignment, repair, and diagnostics</text>
+  <text x="1065" y="430" text-anchor="middle" class="card-title">Scoring</text>
+  <text x="1065" y="457" text-anchor="middle" class="card-body">repair score + diagnostics</text>
 
-  <text x="850" y="570" text-anchor="middle" class="card-title">Web Search Model Pool</text>
-  <text x="850" y="597" text-anchor="middle" class="card-body">OpenAI, Perplexity,</text>
-  <text x="850" y="617" text-anchor="middle" class="card-body">Anthropic, Gemini</text>
+  <text x="865" y="580" text-anchor="middle" class="card-title">Model Pool</text>
+  <text x="865" y="607" text-anchor="middle" class="card-body">OpenAI, Perplexity</text>
+  <text x="865" y="627" text-anchor="middle" class="card-body">Anthropic, Gemini</text>
 
-  <text x="1172.5" y="290" text-anchor="middle" class="card-title">SQLite Benchmark DB</text>
-  <text x="1172.5" y="317" text-anchor="middle" class="card-body">articles, modified variants,</text>
-  <text x="1172.5" y="337" text-anchor="middle" class="card-body">responses, scores</text>
+  <text x="1380" y="430" text-anchor="middle" class="card-title">Benchmark DB</text>
+  <text x="1380" y="457" text-anchor="middle" class="card-body">SQLite: articles, outputs, scores</text>
 
-  <text x="1422.5" y="290" text-anchor="middle" class="card-title">Run Artifacts</text>
-  <text x="1422.5" y="317" text-anchor="middle" class="card-body">runs/</text>
-  <text x="1422.5" y="337" text-anchor="middle" class="card-body">benchmark.db + manifest</text>
+  <text x="1380" y="577" text-anchor="middle" class="card-title">Public Export</text>
+  <text x="1380" y="604" text-anchor="middle" class="card-body">snapshot + viewer build</text>
 
-  <text x="1295" y="470" text-anchor="middle" class="card-title">Public Export &amp; Site Build</text>
-  <text x="1295" y="497" text-anchor="middle" class="card-body">publish_latest_to_viewer.py + build_pages_site.py</text>
+  <text x="1300" y="700" text-anchor="middle" class="card-title">Viewer Bundle</text>
+  <text x="1300" y="727" text-anchor="middle" class="card-body">viewer/ + data/latest/</text>
 
-  <text x="1172.5" y="650" text-anchor="middle" class="card-title">Viewer Bundle</text>
-  <text x="1172.5" y="677" text-anchor="middle" class="card-body">viewer/ + data/latest/</text>
-  <text x="1172.5" y="697" text-anchor="middle" class="card-body">public-safe snapshot</text>
+  <text x="1460" y="700" text-anchor="middle" class="dark-title">GitHub Pages</text>
+  <text x="1460" y="727" text-anchor="middle" class="pages-body">live demo</text>
 
-  <text x="1417.5" y="650" text-anchor="middle" class="dark-title">GitHub Pages Viewer</text>
-  <text x="1417.5" y="677" text-anchor="middle" class="pages-body">static public benchmark explorer</text>
-
-  <path d="M310 290C365 290 395 361 460 361" stroke="#2563EB" stroke-width="3" fill="none" marker-end="url(#arrowBlue)"/>
-  <path d="M310 431C420 431 450 268 560 268" stroke="#64748B" stroke-width="3" stroke-dasharray="8 8" fill="none" marker-end="url(#arrowGray)"/>
-  <path d="M310 570C440 570 440 268 560 268" stroke="#64748B" stroke-width="3" stroke-dasharray="8 8" fill="none" marker-end="url(#arrowGray)"/>
-  <path d="M690 311V315" stroke="#64748B" stroke-width="3" stroke-dasharray="8 8" fill="none" marker-end="url(#arrowGray)"/>
-  <path d="M570 407V425" stroke="#2563EB" stroke-width="3" fill="none" marker-end="url(#arrowBlue)"/>
-  <path d="M570 517V535" stroke="#2563EB" stroke-width="3" fill="none" marker-end="url(#arrowBlue)"/>
-  <path d="M730 585H680" stroke="#0F766E" stroke-width="3" fill="none" marker-end="url(#arrowGreen)"/>
-  <path d="M570 627V645" stroke="#2563EB" stroke-width="3" fill="none" marker-end="url(#arrowBlue)"/>
-  <path d="M680 691C820 691 885 303 1070 303" stroke="#2563EB" stroke-width="3" fill="none" marker-end="url(#arrowBlue)"/>
-  <path d="M820 268C1005 268 1135 303 1325 303" stroke="#64748B" stroke-width="3" stroke-dasharray="8 8" fill="none" marker-end="url(#arrowGray)"/>
-  <path d="M1172.5 350V430" stroke="#EA580C" stroke-width="3" fill="none" marker-end="url(#arrowOrange)"/>
-  <path d="M1295 540C1295 585 1172.5 575 1172.5 615" stroke="#EA580C" stroke-width="3" fill="none" marker-end="url(#arrowOrange)"/>
-  <path d="M1275 665H1315" stroke="#EA580C" stroke-width="3" fill="none" marker-end="url(#arrowOrange)"/>
+  <path d="M290 294H320V442H360" stroke="#2563EB" stroke-width="3" fill="none" marker-end="url(#arrowBlue)"/>
+  <path d="M290 434H320V266H500" stroke="#64748B" stroke-width="3" stroke-dasharray="8 8" fill="none" marker-end="url(#arrowGray)"/>
+  <path d="M290 554H350V286H500" stroke="#64748B" stroke-width="3" stroke-dasharray="8 8" fill="none" marker-end="url(#arrowGray)"/>
+  <path d="M530 442H560" stroke="#2563EB" stroke-width="3" fill="none" marker-end="url(#arrowBlue)"/>
+  <path d="M740 442H770" stroke="#2563EB" stroke-width="3" fill="none" marker-end="url(#arrowBlue)"/>
+  <path d="M865 545V501" stroke="#0F766E" stroke-width="3" fill="none" marker-end="url(#arrowGreen)"/>
+  <path d="M960 442H990" stroke="#2563EB" stroke-width="3" fill="none" marker-end="url(#arrowBlue)"/>
+  <path d="M1140 442H1230" stroke="#2563EB" stroke-width="3" fill="none" marker-end="url(#arrowBlue)"/>
+  <path d="M1380 489V540" stroke="#EA580C" stroke-width="3" fill="none" marker-end="url(#arrowOrange)"/>
+  <path d="M1330 640V655H1300V665" stroke="#EA580C" stroke-width="3" fill="none" marker-end="url(#arrowOrange)"/>
+  <path d="M1370 707H1390" stroke="#EA580C" stroke-width="3" fill="none" marker-end="url(#arrowOrange)"/>
 </svg>
