@@ -1,0 +1,668 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fake News LLM Benchmark</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+    <style>
+        :root {
+            --surface-base: #ECE9E0;
+            --surface-raised: #DBD1C0;
+            --surface-overlay: #0F0F10;
+            --text-primary: #625F59;
+            --text-secondary: #9F9F9C;
+            --text-tertiary: #454036;
+            --accent: #5E6AD2;
+            --danger: #8B3B2E;
+            --space-1: 4px;
+            --space-2: 8px;
+            --space-3: 12px;
+            --space-4: 16px;
+            --space-5: 20px;
+            --space-6: 24px;
+            --space-8: 32px;
+            --radius-sm: 3px;
+            --radius-lg: 15px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            background: var(--surface-base);
+            color-scheme: light;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100dvh;
+            padding:
+                max(var(--space-6), env(safe-area-inset-top))
+                max(var(--space-6), env(safe-area-inset-right))
+                max(var(--space-8), env(safe-area-inset-bottom))
+                max(var(--space-6), env(safe-area-inset-left));
+            background: var(--surface-base);
+            color: var(--text-primary);
+            font-family: "Inter", sans-serif;
+            line-height: 1.5;
+        }
+
+        body,
+        button,
+        input,
+        select {
+            font: inherit;
+        }
+
+        .page {
+            width: min(100%, 1920px);
+            margin: 0 auto;
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        .hero,
+        .panel {
+            border: 1px solid rgba(69, 64, 54, 0.12);
+            border-radius: var(--radius-lg);
+            background: rgba(219, 209, 192, 0.34);
+        }
+
+        .hero {
+            padding: var(--space-8);
+        }
+
+        .hero-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 579px) minmax(280px, 360px);
+            justify-content: space-between;
+            gap: var(--space-6);
+            align-items: start;
+        }
+
+        .hero-copy {
+            display: grid;
+            gap: var(--space-4);
+        }
+
+        .eyebrow {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            text-wrap: balance;
+        }
+
+        .hero h1 {
+            margin: 0;
+            font-size: 68px;
+            line-height: 1;
+            font-weight: 700;
+            color: var(--text-tertiary);
+            text-wrap: balance;
+        }
+
+        .lede {
+            margin: 0;
+            font-size: 33px;
+            font-weight: 600;
+            line-height: 1.15;
+            color: var(--text-tertiary);
+            text-wrap: balance;
+        }
+
+        .hero-rail {
+            display: grid;
+            gap: var(--space-3);
+        }
+
+        .hero-card {
+            display: grid;
+            gap: var(--space-1);
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(69, 64, 54, 0.12);
+            background: rgba(236, 233, 224, 0.72);
+        }
+
+        .hero-card span {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .hero-card strong {
+            font-size: 33px;
+            font-weight: 600;
+            line-height: 1.05;
+            color: var(--text-tertiary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .panel {
+            padding: var(--space-6);
+        }
+
+        .panel-head {
+            display: flex;
+            justify-content: space-between;
+            gap: var(--space-4);
+            align-items: end;
+            flex-wrap: wrap;
+            margin-bottom: var(--space-5);
+        }
+
+        .panel h2,
+        .article-card h3 {
+            margin: 0;
+            color: var(--text-tertiary);
+            text-wrap: balance;
+        }
+
+        .panel h2 {
+            font-size: 23px;
+            font-weight: 500;
+            line-height: 1.2;
+        }
+
+        .panel-head p,
+        .meta,
+        .empty,
+        .status {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text-primary);
+            text-wrap: pretty;
+        }
+
+        .article-grid,
+        .two-column {
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        .two-column {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .article-card {
+            display: grid;
+            gap: var(--space-4);
+            padding: var(--space-5);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(69, 64, 54, 0.12);
+            background: rgba(236, 233, 224, 0.9);
+        }
+
+        .article-card h3 {
+            font-size: 21px;
+            font-weight: 500;
+            line-height: 1.25;
+        }
+
+        .article-header {
+            display: grid;
+            gap: var(--space-2);
+        }
+
+        .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-2);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: var(--radius-lg);
+            font-size: 14px;
+            font-weight: 500;
+            background: rgba(219, 209, 192, 0.86);
+            color: var(--text-primary);
+        }
+
+        .badge.link {
+            color: var(--text-tertiary);
+            text-decoration: none;
+        }
+
+        .badge.link:hover {
+            text-decoration: underline;
+        }
+
+        .badge.link:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .badge.accent {
+            background: rgba(94, 106, 210, 0.12);
+            color: var(--accent);
+        }
+
+        .article-pair {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: var(--space-4);
+        }
+
+        .article-block {
+            display: grid;
+            gap: var(--space-2);
+        }
+
+        .article-block h4 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 500;
+            color: var(--text-tertiary);
+        }
+
+        .article-text,
+        .chart-shell,
+        .table-wrap {
+            border: 1px solid rgba(69, 64, 54, 0.12);
+            border-radius: var(--radius-lg);
+            background: rgba(236, 233, 224, 0.78);
+        }
+
+        .article-text {
+            padding: var(--space-4);
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            text-wrap: pretty;
+        }
+
+        .entity-original {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .entity-modified {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .chart-shell {
+            padding: var(--space-4);
+            height: 360px;
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 860px;
+            font-variant-numeric: tabular-nums;
+        }
+
+        th,
+        td {
+            padding: var(--space-4);
+            border-bottom: 1px solid rgba(69, 64, 54, 0.12);
+            text-align: left;
+            vertical-align: top;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        th {
+            color: var(--text-primary);
+            font-weight: 500;
+            background: rgba(219, 209, 192, 0.42);
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr:hover {
+            background: rgba(219, 209, 192, 0.54);
+        }
+
+        .status,
+        .empty {
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(69, 64, 54, 0.12);
+            background: rgba(236, 233, 224, 0.9);
+        }
+
+        .status.error {
+            color: var(--danger);
+            border-color: rgba(139, 59, 46, 0.22);
+            background: rgba(139, 59, 46, 0.08);
+        }
+
+        @media (max-width: 1200px) {
+            .hero-layout,
+            .two-column,
+            .article-pair {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 980px) {
+            .hero {
+                padding: var(--space-6);
+            }
+
+            .hero h1 {
+                font-size: 44px;
+            }
+
+            .lede,
+            .hero-card strong {
+                font-size: 23px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .hero,
+            .panel,
+            .article-card {
+                padding: var(--space-5);
+            }
+
+            table {
+                min-width: 640px;
+            }
+
+            th,
+            td {
+                padding: var(--space-3);
+            }
+
+            .chart-shell {
+                height: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <section class="hero">
+            <div class="hero-layout">
+                <div class="hero-copy">
+                    <p class="eyebrow">Live benchmark dashboard</p>
+                    <h1>Review how models rewrite manipulated news content.</h1>
+                    <p class="lede">Track original versus modified articles, compare model-level scores, and inspect every evaluation in a warm, text-forward layout.</p>
+                </div>
+                <div class="hero-rail" aria-label="Dashboard highlights">
+                    <article class="hero-card">
+                        <span>Articles</span>
+                        <strong>{{ news_items|length }}</strong>
+                    </article>
+                    <article class="hero-card">
+                        <span>Models</span>
+                        <strong>{{ model_scores|length if model_scores else 0 }}</strong>
+                    </article>
+                    <article class="hero-card">
+                        <span>Evaluations</span>
+                        <strong>{{ results|length if results else 0 }}</strong>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head">
+                <div>
+                    <h2>Latest Articles</h2>
+                    <p class="meta">Each card pairs the original article with the injected change so you can compare the edit directly.</p>
+                </div>
+            </div>
+
+            {% if news_items %}
+            <div class="article-grid">
+                {% for news in news_items %}
+                <article class="article-card">
+                    <div class="article-header">
+                        <h3>{{ news.title }}</h3>
+                        <p class="meta">Published {{ news.published_date.strftime('%Y-%m-%d') if news.published_date else 'Unknown date' }}</p>
+                    </div>
+                    <div class="badge-row">
+                        <span class="badge">Source: {{ news.source }}</span>
+                        <span class="badge accent">Modification: {% if news.entity_type %}{{ news.entity_type }}{% else %}{{ news.modification_type }}{% endif %}</span>
+                        {% if news.url %}
+                        <a href="{{ news.url }}" target="_blank" rel="noreferrer" class="badge link">Original article</a>
+                        {% endif %}
+                    </div>
+                    <div class="article-pair">
+                        <section class="article-block">
+                            <h4>Original</h4>
+                            <div class="article-text">
+                                {% if news.modification_type == "entity" and news.original_entity %}
+                                    {% set original_parts = news.content.split(news.original_entity) %}
+                                    {% if original_parts|length > 1 %}
+                                        {{ original_parts[0] | safe }}<span class="entity-original">{{ news.original_entity }}</span>{{ original_parts[1:] | join(news.original_entity) | safe }}
+                                    {% else %}
+                                        {{ news.content | safe }}
+                                    {% endif %}
+                                {% else %}
+                                    {{ news.content | safe }}
+                                {% endif %}
+                            </div>
+                        </section>
+                        <section class="article-block">
+                            <h4>Modified</h4>
+                            <div class="article-text">
+                                {% if news.modification_type == "entity" and news.modified_entity %}
+                                    {% set modified_parts = news.modified_content.split(news.modified_entity) %}
+                                    {% if modified_parts|length > 1 %}
+                                        {{ modified_parts[0] | safe }}<span class="entity-modified">{{ news.modified_entity }}</span>{{ modified_parts[1:] | join(news.modified_entity) | safe }}
+                                    {% else %}
+                                        {{ news.modified_content | safe }}
+                                    {% endif %}
+                                {% else %}
+                                    {{ news.modified_content | safe }}
+                                {% endif %}
+                            </div>
+                        </section>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty">No article pairs are available yet.</p>
+            {% endif %}
+        </section>
+
+        {% if model_scores %}
+        <section class="two-column">
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>Model Performance</h2>
+                        <p class="meta">All metrics are shown on a shared 0-1 scale for quick comparison.</p>
+                    </div>
+                </div>
+                <div class="chart-shell">
+                    <canvas id="performanceChart" aria-label="Model performance chart"></canvas>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>Model Scores</h2>
+                        <p class="meta">Average scores across the currently available evaluations.</p>
+                    </div>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>NLI (E)</th>
+                                <th>NLI (C)</th>
+                                <th>G-Eval</th>
+                                <th>Semantic</th>
+                                <th>Lexical</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for model, scores in model_scores.items() %}
+                            <tr>
+                                <td>{{ model }}</td>
+                                <td>{{ "%.3f"|format(scores.nli_entailment / 100) }}</td>
+                                <td>{{ "%.3f"|format(scores.nli_contradiction / 100) }}</td>
+                                <td>{{ "%.3f"|format(scores.geval_factuality) }}</td>
+                                <td>{{ "%.3f"|format(scores.semantic_similarity) }}</td>
+                                <td>{{ "%.3f"|format(scores.lexical_distance) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+        {% else %}
+        <section class="panel">
+            <p class="status error">No model evaluations are available yet. Configure your keys and run the evaluation pipeline to populate this dashboard.</p>
+        </section>
+        {% endif %}
+
+        {% if results %}
+        <section class="panel">
+            <div class="panel-head">
+                <div>
+                    <h2>Detailed Results</h2>
+                    <p class="meta">Inspect each evaluation row across NLI, G-Eval, semantic similarity, and lexical distance.</p>
+                </div>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Model</th>
+                            <th>Source</th>
+                            <th>Modification</th>
+                            <th>NLI (E)</th>
+                            <th>NLI (C)</th>
+                            <th>G-Eval</th>
+                            <th>Semantic</th>
+                            <th>Lexical</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for news, eval_result in results %}
+                        {% if eval_result %}
+                        <tr>
+                            <td>{{ news.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>{{ eval_result.llm_model }}</td>
+                            <td>{{ news.source }}</td>
+                            <td>{{ news.modification_type }}</td>
+                            <td>{{ "%.3f"|format(eval_result.nli_scores.get('entailment', 0) / 100) if eval_result.nli_scores else "N/A" }}</td>
+                            <td>{{ "%.3f"|format(eval_result.nli_scores.get('contradiction', 0) / 100) if eval_result.nli_scores else "N/A" }}</td>
+                            <td>{{ "%.3f"|format(eval_result.geval_scores.get('normalized_overall', 0)) if eval_result.geval_scores else "N/A" }}</td>
+                            <td>{{ "%.3f"|format(eval_result.semantic_similarity) if eval_result.semantic_similarity is not none else "N/A" }}</td>
+                            <td>{{ "%.3f"|format(eval_result.lexical_distance.get('norm_edit_similarity', 0)) if eval_result.lexical_distance else "N/A" }}</td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        {% endif %}
+    </main>
+
+    <script>
+        {% if model_scores %}
+        const ctx = document.getElementById("performanceChart").getContext("2d");
+        const modelScores = {{ model_scores|tojson }};
+
+        const models = Object.keys(modelScores);
+        const metrics = ["nli_entailment", "nli_contradiction", "geval_factuality", "semantic_similarity", "lexical_distance"];
+        const metricLabels = ["NLI (E)", "NLI (C)", "G-Eval", "Semantic", "Lexical"];
+        const palette = ["#5E6AD2", "#625F59", "#454036", "#0F0F10", "#8B3B2E"];
+
+        const datasets = metrics.map((metric, index) => ({
+            label: metricLabels[index],
+            data: models.map((model) => {
+                const value = modelScores[model][metric];
+                return metric === "nli_entailment" || metric === "nli_contradiction" ? value / 100 : value;
+            }),
+            borderColor: palette[index],
+            pointBackgroundColor: palette[index],
+            pointRadius: 3,
+            pointHoverRadius: 3,
+            borderWidth: 2,
+            fill: false,
+            tension: 0
+        }));
+
+        new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: models,
+                datasets: datasets
+            },
+            options: {
+                animation: false,
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: "nearest",
+                    intersect: false
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: "#454036",
+                            font: {
+                                family: "Inter",
+                                size: 14,
+                                weight: "500"
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: "#625F59",
+                            font: {
+                                family: "Inter",
+                                size: 14
+                            }
+                        },
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 1,
+                        ticks: {
+                            color: "#625F59",
+                            font: {
+                                family: "Inter",
+                                size: 14
+                            }
+                        },
+                        grid: {
+                            color: "rgba(69, 64, 54, 0.12)"
+                        }
+                    }
+                }
+            }
+        });
+        {% endif %}
+    </script>
+</body>
+</html>

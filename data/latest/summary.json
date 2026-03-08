@@ -1,0 +1,32 @@
+{
+  "generated_at_utc": "2026-03-08T17:10:00Z",
+  "publish_mode": "supplemental",
+  "latest_run_id": "",
+  "source_runs": [],
+  "article_count": 30,
+  "evaluation_count": 120,
+  "model_count": 4,
+  "source_count": 4,
+  "modification_count": 1,
+  "available_models": [
+    "google:gemini-3.1-pro-preview",
+    "openai:gpt-5.4",
+    "anthropic:claude-sonnet-4-6",
+    "perplexity:sonar"
+  ],
+  "available_sources": [
+    "Al Jazeera",
+    "BBC",
+    "NPR",
+    "The Guardian"
+  ],
+  "available_modifications": [
+    "entity"
+  ],
+  "latest_article_at": "2026-03-08T15:51:53Z",
+  "latest_result_at": "2026-03-08T17:09:29Z",
+  "top_model": "google:gemini-3.1-pro-preview",
+  "repairable_result_count": 120,
+  "avg_targeted_correction_score": 0.6958,
+  "best_repair_model": "google:gemini-3.1-pro-preview"
+}

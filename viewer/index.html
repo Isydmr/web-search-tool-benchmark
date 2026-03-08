@@ -1,0 +1,2213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fake News Benchmark Viewer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --surface-base: #ECE9E0;
+      --surface-raised: #DBD1C0;
+      --surface-overlay: #0F0F10;
+      --text-primary: #625F59;
+      --text-secondary: #9F9F9C;
+      --text-tertiary: #454036;
+      --accent: #5E6AD2;
+      --success: #219653;
+      --success-soft: rgba(33, 150, 83, 0.12);
+      --warning: #C1841E;
+      --warning-soft: rgba(193, 132, 30, 0.14);
+      --danger: #8B3B2E;
+      --danger-soft: rgba(139, 59, 46, 0.12);
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --radius-sm: 3px;
+      --radius-lg: 15px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      min-height: 100%;
+      background: var(--surface-base);
+      color-scheme: light;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      padding:
+        max(var(--space-6), env(safe-area-inset-top))
+        max(var(--space-6), env(safe-area-inset-right))
+        max(var(--space-8), env(safe-area-inset-bottom))
+        max(var(--space-6), env(safe-area-inset-left));
+      background: var(--surface-base);
+      color: var(--text-primary);
+      font-family: "Inter", sans-serif;
+      line-height: 1.5;
+    }
+
+    body,
+    button,
+    input,
+    select,
+    summary {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100%, 1920px);
+      margin: 0 auto;
+      display: grid;
+      gap: var(--space-6);
+    }
+
+    .hero,
+    .panel {
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      border-radius: var(--radius-lg);
+      background: rgba(219, 209, 192, 0.34);
+    }
+
+    .hero {
+      padding: var(--space-8);
+    }
+
+    .hero-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 579px) minmax(280px, 360px);
+      justify-content: space-between;
+      gap: var(--space-6);
+      align-items: start;
+    }
+
+    .hero h1 {
+      margin: 0;
+      font-size: 68px;
+      line-height: 1;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      text-wrap: balance;
+    }
+
+    .hero-copy {
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .eyebrow {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      text-wrap: balance;
+    }
+
+    .lede {
+      margin: 0;
+      font-size: 33px;
+      font-weight: 600;
+      line-height: 1.15;
+      color: var(--text-tertiary);
+      text-wrap: balance;
+    }
+
+    .hero-note {
+      margin: 0;
+      max-width: 579px;
+      font-size: 16px;
+      line-height: 1.55;
+      color: var(--text-primary);
+      text-wrap: pretty;
+    }
+
+    .hero-rail {
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .demo-slider-container {
+      display: grid;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      background: rgba(236, 233, 224, 0.72);
+    }
+
+    .demo-label {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .demo-slider {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      cursor: ew-resize;
+      user-select: none;
+    }
+
+    .demo-original,
+    .demo-corrected {
+      padding: var(--space-4);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--text-primary);
+    }
+
+    .demo-original {
+      background: rgba(219, 209, 192, 0.34);
+    }
+
+    .demo-corrected {
+      position: absolute;
+      inset: 0;
+      background: var(--surface-base);
+      clip-path: inset(0 0 0 var(--reveal-width, 100%));
+      transition: clip-path 50ms ease-out;
+    }
+
+    .demo-corrected .highlight {
+      background: rgba(33, 150, 83, 0.2);
+      border-radius: 3px;
+      padding: 1px 2px;
+    }
+
+    .demo-handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--accent);
+      transform: translateX(-50%);
+      left: var(--reveal-width, 100%);
+      pointer-events: none;
+      transition: left 50ms ease-out;
+    }
+
+    .demo-handle::after {
+      content: "↔";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .hero-card {
+      display: grid;
+      gap: var(--space-1);
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      background: rgba(236, 233, 224, 0.72);
+    }
+
+    .hero-card span {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .hero-card strong {
+      font-size: 21px;
+      font-weight: 500;
+      line-height: 1.3;
+      color: var(--text-tertiary);
+      text-wrap: balance;
+    }
+
+    .panel {
+      padding: var(--space-6);
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-4);
+      align-items: end;
+      flex-wrap: wrap;
+      margin-bottom: var(--space-5);
+    }
+
+    .panel h2 {
+      margin: 0;
+      font-size: 23px;
+      font-weight: 500;
+      line-height: 1.2;
+      color: var(--text-tertiary);
+      text-wrap: balance;
+    }
+
+    .panel-head p,
+    .meta,
+    .empty,
+    .status {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-primary);
+      text-wrap: pretty;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(146px, 1fr));
+      gap: var(--space-3);
+    }
+
+    .stat-card {
+      display: grid;
+      gap: var(--space-2);
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      background: rgba(236, 233, 224, 0.84);
+    }
+
+    .stat-card strong {
+      display: block;
+      font-size: 33px;
+      font-weight: 600;
+      line-height: 1.05;
+      color: var(--text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.9fr) minmax(280px, 360px);
+      gap: var(--space-6);
+      align-items: start;
+    }
+
+    .controls {
+      display: grid;
+      gap: var(--space-4);
+      position: sticky;
+      top: max(var(--space-6), env(safe-area-inset-top));
+      padding: var(--space-5);
+    }
+
+    label {
+      display: grid;
+      gap: var(--space-2);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+      gap: var(--space-3);
+      align-items: end;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(69, 64, 54, 0.18);
+      padding: 12px var(--space-4);
+      color: var(--text-tertiary);
+      background: rgba(236, 233, 224, 0.92);
+    }
+
+    input::placeholder {
+      color: rgba(98, 95, 89, 0.7);
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      align-self: start;
+      padding: 12px var(--space-4);
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: rgba(219, 209, 192, 0.9);
+      color: var(--text-tertiary);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .filter-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    #resetFilters {
+      padding: 11px 16px;
+      border-radius: var(--radius-sm);
+      border-color: rgba(69, 64, 54, 0.18);
+      background: rgba(236, 233, 224, 0.92);
+      color: var(--text-tertiary);
+      font-weight: 500;
+    }
+
+    #resetFilters:hover {
+      background: rgba(219, 209, 192, 0.84);
+      border-color: rgba(69, 64, 54, 0.2);
+    }
+
+    a,
+    button,
+    input,
+    select,
+    summary {
+      outline: none;
+    }
+
+    a:focus-visible,
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    summary:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .leaderboard-shell {
+      display: grid;
+      gap: var(--space-4);
+    }
+
+    .leaderboard-legend,
+    .leaderboard-summary,
+    .provider-tabs,
+    .leaderboard-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .legend-pill,
+    .summary-pill,
+    .provider-tab,
+    .metric-pill,
+    .provider-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      background: rgba(236, 233, 224, 0.84);
+      color: var(--text-primary);
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1;
+    }
+
+    .summary-pill strong,
+    .metric-pill strong {
+      color: var(--text-tertiary);
+      font-weight: 600;
+    }
+
+    .summary-pill.scope {
+      background: rgba(219, 209, 192, 0.7);
+    }
+
+    .summary-pill.corrected strong,
+    .legend-pill.corrected {
+      color: var(--success);
+    }
+
+    .summary-pill.partial strong,
+    .legend-pill.partial {
+      color: var(--warning);
+    }
+
+    .summary-pill.fake-kept strong,
+    .legend-pill.fake-kept {
+      color: var(--danger);
+    }
+
+    .summary-pill.corrected {
+      background: var(--success-soft);
+    }
+
+    .legend-pill.corrected {
+      background: var(--success-soft);
+    }
+
+    .summary-pill.partial {
+      background: var(--warning-soft);
+    }
+
+    .legend-pill.partial {
+      background: var(--warning-soft);
+    }
+
+    .summary-pill.fake-kept {
+      background: var(--danger-soft);
+    }
+
+    .legend-pill.fake-kept {
+      background: var(--danger-soft);
+    }
+
+    .provider-tab {
+      cursor: pointer;
+      background: rgba(236, 233, 224, 0.74);
+      transition: background 140ms ease, border-color 140ms ease, color 140ms ease;
+    }
+
+    .provider-tab:hover {
+      background: rgba(219, 209, 192, 0.9);
+    }
+
+    .provider-tab.is-active {
+      background: rgba(219, 209, 192, 0.92);
+      border-color: rgba(69, 64, 54, 0.22);
+      color: var(--text-tertiary);
+    }
+
+    .provider-tab.is-empty {
+      opacity: 0.6;
+    }
+
+    .provider-count {
+      min-width: 20px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(69, 64, 54, 0.08);
+      color: var(--text-tertiary);
+      text-align: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .provider-dot,
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex: 0 0 auto;
+    }
+
+    .leaderboard-list {
+      display: grid;
+      gap: var(--space-3);
+    }
+
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 280px) minmax(0, 1fr) minmax(120px, 148px);
+      gap: var(--space-4);
+      align-items: center;
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      background: rgba(236, 233, 224, 0.84);
+    }
+
+    .leaderboard-rank {
+      font-size: 29px;
+      font-weight: 600;
+      line-height: 1;
+      color: rgba(69, 64, 54, 0.72);
+      text-align: center;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .leaderboard-model {
+      display: grid;
+      gap: var(--space-2);
+      min-width: 0;
+    }
+
+    .leaderboard-name {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .leaderboard-name h3 {
+      margin: 0;
+      font-size: 31px;
+      line-height: 1.05;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-wrap: balance;
+    }
+
+    .provider-badge {
+      padding: 6px 10px;
+      font-size: 13px;
+      background: rgba(219, 209, 192, 0.66);
+      color: var(--text-primary);
+    }
+
+    .leaderboard-bar-panel {
+      display: grid;
+      gap: var(--space-2);
+      min-width: 0;
+    }
+
+    .leaderboard-bar {
+      display: flex;
+      min-width: 0;
+      overflow: hidden;
+      border-radius: 999px;
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      background: rgba(219, 209, 192, 0.66);
+      min-height: 30px;
+    }
+
+    .leaderboard-segment {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 0;
+      padding: 4px 0;
+      color: #FBF8F0;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .leaderboard-segment.corrected {
+      background: var(--success);
+    }
+
+    .leaderboard-segment.partial {
+      background: var(--warning);
+    }
+
+    .leaderboard-segment.fake-kept {
+      background: #C44036;
+    }
+
+    .leaderboard-caption {
+      margin: 0;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .leaderboard-score {
+      display: grid;
+      gap: 2px;
+      align-self: stretch;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      background: rgba(219, 209, 192, 0.58);
+      text-align: right;
+    }
+
+    .leaderboard-score span {
+      font-size: 13px;
+      color: var(--text-primary);
+    }
+
+    .leaderboard-score strong {
+      font-size: 29px;
+      line-height: 1;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      border-radius: var(--radius-lg);
+      background: rgba(236, 233, 224, 0.72);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    th,
+    td {
+      padding: var(--space-4);
+      border-bottom: 1px solid rgba(69, 64, 54, 0.12);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    th {
+      color: var(--text-primary);
+      font-weight: 500;
+      background: rgba(219, 209, 192, 0.42);
+    }
+
+    th[aria-sort="ascending"],
+    th[aria-sort="descending"] {
+      background: rgba(219, 209, 192, 0.66);
+    }
+
+    .sort-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 0;
+      border: none;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .sort-button:hover,
+    .sort-button:focus-visible {
+      color: var(--text-tertiary);
+    }
+
+    .sort-button:focus-visible {
+      outline: 2px solid rgba(196, 85, 48, 0.55);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .sort-indicator {
+      min-width: 1.75em;
+      margin-left: auto;
+      color: var(--text-secondary);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .sort-button[data-direction="ascending"] .sort-indicator,
+    .sort-button[data-direction="descending"] .sort-indicator {
+      color: var(--text-tertiary);
+      font-weight: 600;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: rgba(219, 209, 192, 0.54);
+    }
+
+    .score {
+      font-variant-numeric: tabular-nums;
+      font-weight: 600;
+      color: var(--text-tertiary);
+    }
+
+    .article-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-4);
+      align-items: start;
+    }
+
+    .article-card {
+      display: grid;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      background: rgba(236, 233, 224, 0.9);
+      align-content: start;
+    }
+
+    .article-card-header {
+      display: grid;
+      gap: 2px;
+    }
+
+    .article-card h3 {
+      margin: 0;
+      font-size: 21px;
+      line-height: 1.25;
+      font-weight: 500;
+      color: var(--text-tertiary);
+      text-wrap: balance;
+    }
+
+    .article-title-link {
+      color: inherit;
+      text-decoration: none;
+      transition: color 120ms ease;
+    }
+
+    .article-title-link:hover {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .entity-change {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--space-2);
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.4;
+      color: var(--text-primary);
+    }
+
+    .entity-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .entity-chip.previous {
+      background: rgba(139, 59, 46, 0.12);
+      color: var(--danger);
+    }
+
+    .entity-chip.updated {
+      background: rgba(33, 150, 83, 0.12);
+      color: var(--success);
+    }
+
+    .entity-arrow {
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    .reveal-container {
+      display: grid;
+      gap: var(--space-1);
+    }
+
+    .reveal-slider {
+      --reveal-width: 58%;
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-lg);
+      cursor: ew-resize;
+      user-select: none;
+      touch-action: pan-y;
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      background: rgba(219, 209, 192, 0.34);
+    }
+
+    .reveal-original,
+    .reveal-modified {
+      padding: var(--space-4);
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--text-primary);
+      white-space: pre-wrap;
+      text-indent: 0;
+    }
+
+    .reveal-original {
+      background: rgba(219, 209, 192, 0.34);
+    }
+
+    .reveal-original .highlight-original,
+    .reveal-modified .highlight-original {
+      background: rgba(139, 59, 46, 0.16);
+      border-radius: 3px;
+      padding: 1px 2px;
+      color: var(--danger);
+    }
+
+    .reveal-modified {
+      position: absolute;
+      inset: 0;
+      background: var(--surface-base);
+      clip-path: inset(0 0 0 var(--reveal-width, 100%));
+      transition: clip-path 50ms ease-out;
+    }
+
+    .reveal-modified .highlight {
+      background: rgba(33, 150, 83, 0.2);
+      border-radius: 3px;
+      padding: 1px 2px;
+      color: var(--success);
+    }
+
+    .reveal-handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--accent);
+      transform: translateX(-50%);
+      left: var(--reveal-width, 100%);
+      pointer-events: none;
+      transition: left 50ms ease-out;
+    }
+
+    .reveal-handle::after {
+      content: "↔";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
+      background: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1);
+      align-items: center;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: var(--radius-lg);
+      font-size: 14px;
+      font-weight: 500;
+      background: rgba(219, 209, 192, 0.86);
+      color: var(--text-primary);
+    }
+
+    .tag.edit {
+      background: rgba(94, 106, 210, 0.12);
+      color: var(--accent);
+    }
+
+    .tag.muted {
+      background: rgba(69, 64, 54, 0.06);
+      color: var(--text-primary);
+    }
+
+    .tag.alert {
+      background: rgba(69, 64, 54, 0.08);
+      color: var(--text-tertiary);
+    }
+
+    details {
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      border-radius: var(--radius-lg);
+      background: rgba(219, 209, 192, 0.22);
+      padding: var(--space-3) var(--space-4);
+    }
+
+    summary {
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text-tertiary);
+    }
+
+    details p {
+      margin: var(--space-3) 0 0;
+      font-size: 16px;
+      line-height: 1.55;
+      color: var(--text-primary);
+      text-wrap: pretty;
+      white-space: pre-wrap;
+    }
+
+    a {
+      color: var(--text-tertiary);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    code {
+      padding: 0 var(--space-1);
+      border-radius: var(--radius-sm);
+      background: rgba(69, 64, 54, 0.08);
+      color: var(--text-tertiary);
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+      font-size: 0.94em;
+    }
+
+    .empty,
+    .status {
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(69, 64, 54, 0.12);
+      background: rgba(236, 233, 224, 0.9);
+    }
+
+    .status {
+      background: rgba(94, 106, 210, 0.08);
+      border-color: rgba(94, 106, 210, 0.18);
+      color: var(--text-tertiary);
+    }
+
+    .status.error,
+    .filter-status.error {
+      color: var(--danger);
+      border-color: rgba(139, 59, 46, 0.22);
+      background: rgba(139, 59, 46, 0.08);
+    }
+
+    .filter-status {
+      flex: 1 1 320px;
+      min-width: min(100%, 320px);
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-primary);
+      text-wrap: pretty;
+    }
+
+    .filter-status.error {
+      padding: var(--space-4);
+      border: 1px solid rgba(139, 59, 46, 0.22);
+      border-radius: var(--radius-lg);
+    }
+
+    @media (max-width: 1200px) {
+      .hero-layout,
+      .layout,
+      .article-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .leaderboard-row {
+        grid-template-columns: 44px minmax(0, 1fr) minmax(128px, 148px);
+      }
+
+      .leaderboard-score {
+        grid-column: 3;
+        grid-row: 1;
+        text-align: left;
+      }
+
+      .leaderboard-bar-panel {
+        grid-column: 2 / -1;
+        grid-row: 2;
+      }
+
+      .controls {
+        position: static;
+      }
+
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .stats,
+      .article-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding: var(--space-6);
+      }
+
+      .hero h1 {
+        font-size: 44px;
+      }
+
+      .lede {
+        font-size: 23px;
+      }
+
+      .controls {
+        padding: var(--space-4);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .hero,
+      .panel {
+        padding: var(--space-5);
+      }
+
+      .leaderboard-legend,
+      .leaderboard-summary,
+      .provider-tabs,
+      .leaderboard-metrics {
+        gap: 6px;
+      }
+
+      .legend-pill,
+      .summary-pill,
+      .provider-tab,
+      .metric-pill,
+      .provider-badge {
+        font-size: 13px;
+      }
+
+      .leaderboard-row {
+        grid-template-columns: 36px minmax(0, 1fr);
+      }
+
+      .leaderboard-rank {
+        font-size: 24px;
+      }
+
+      .leaderboard-name h3 {
+        font-size: 24px;
+      }
+
+      .filter-actions {
+        align-items: stretch;
+      }
+
+      #resetFilters,
+      .filter-status {
+        width: 100%;
+      }
+
+      .leaderboard-score,
+      .leaderboard-bar-panel {
+        grid-column: 1 / -1;
+      }
+
+      table {
+        min-width: 640px;
+      }
+
+      th,
+      td {
+        padding: var(--space-3);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-layout">
+        <div class="hero-copy">
+          <h1>How AI models handle false information</h1>
+          <p class="lede">Compare how models correct mistakes and retain false claims with web search enabled.</p>
+        </div>
+        <div class="hero-rail" aria-label="Snapshot highlights">
+          <div class="demo-slider-container">
+            <p class="demo-label">Hover to reveal corrections</p>
+            <div class="demo-slider" id="demoSlider">
+              <div class="demo-original">
+                Scientists discover that eating chocolate daily leads to 100% weight loss in just one week, according to a new study published in Nature.
+              </div>
+              <div class="demo-corrected">
+                Scientists discover that eating chocolate daily leads to <span class="highlight">minimal</span> weight loss in just <span class="highlight">30 days</span>, according to a new study published in <span class="highlight">The Lancet</span>.
+              </div>
+              <div class="demo-handle"></div>
+            </div>
+          </div>
+          <article class="hero-card">
+            <span>Updated</span>
+            <strong id="updatedPill">Loading latest snapshot...</strong>
+          </article>
+          <article class="hero-card">
+            <span>Top model</span>
+            <strong id="topModelPill">Waiting for dataset</strong>
+          </article>
+          <article class="hero-card">
+            <span>Repair signal</span>
+            <strong id="repairPill">Repair signal pending</strong>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Leaderboard</h2>
+          <p class="meta">Rows stay sorted by the blended benchmark score. Bars split targeted outcomes into corrected falsehoods, partial repairs, and fake claims that were still kept.</p>
+        </div>
+        <div class="leaderboard-legend" aria-label="Leaderboard legend">
+          <span class="legend-pill corrected"><span class="legend-dot" style="background: var(--success);"></span>Corrected falsehood</span>
+          <span class="legend-pill partial"><span class="legend-dot" style="background: var(--warning);"></span>Partial repair</span>
+          <span class="legend-pill fake-kept"><span class="legend-dot" style="background: #C44036;"></span>Fake kept</span>
+        </div>
+      </div>
+      <div class="leaderboard-shell">
+        <div class="leaderboard-summary" id="leaderboardSummary"></div>
+        <div class="provider-tabs" id="providerTabs" aria-label="Organization tabs"></div>
+        <div class="leaderboard-list" id="leaderboardList"></div>
+      </div>
+      <p class="empty" id="leaderboardEmpty" hidden>No published leaderboard rows yet.</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>Snapshot</h2>
+        <p class="meta" id="snapshotMeta">Looking for published data...</p>
+      </div>
+      <div class="stats" id="statsGrid"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Latest Articles</h2>
+          <p class="meta">Four recent article pairs, prioritizing injected edits over unchanged rows.</p>
+        </div>
+      </div>
+      <div class="article-grid" id="articleGrid"></div>
+      <p class="empty" id="articleEmpty" hidden>No article cards are available yet.</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Detailed Results</h2>
+          <p class="meta" id="resultsMeta">Loading results...</p>
+        </div>
+      </div>
+      <aside class="panel controls" aria-label="Detailed result filters">
+        <p class="meta">Filter the table below. Snapshot metrics stay fixed.</p>
+        <div class="filter-grid">
+          <label>
+            Model
+            <select id="modelFilter">
+              <option value="all">All models</option>
+            </select>
+          </label>
+          <label>
+            Search title or source
+            <input id="searchInput" type="text" placeholder="Reuters, BBC, OpenAI...">
+          </label>
+        </div>
+        <div class="filter-actions">
+          <button id="resetFilters" type="button">Reset filters</button>
+          <p class="filter-status" id="filterStatus">Showing all published rows.</p>
+        </div>
+      </aside>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th aria-sort="none">
+                <button class="sort-button" data-sort-key="article" data-sort-label="Article" type="button">
+                  <span>Article</span>
+                  <span class="sort-indicator" aria-hidden="true">--</span>
+                </button>
+              </th>
+              <th aria-sort="none">
+                <button class="sort-button" data-sort-key="model" data-sort-label="Model" type="button">
+                  <span>Model</span>
+                  <span class="sort-indicator" aria-hidden="true">--</span>
+                </button>
+              </th>
+              <th aria-sort="none">
+                <button class="sort-button" data-sort-key="overall" data-sort-label="Overall" type="button">
+                  <span>Overall</span>
+                  <span class="sort-indicator" aria-hidden="true">--</span>
+                </button>
+              </th>
+              <th aria-sort="none">
+                <button class="sort-button" data-sort-key="repair" data-sort-label="Repair" type="button">
+                  <span>Repair</span>
+                  <span class="sort-indicator" aria-hidden="true">--</span>
+                </button>
+              </th>
+              <th aria-sort="none">
+                <button class="sort-button" data-sort-key="status" data-sort-label="Status" type="button">
+                  <span>Status</span>
+                  <span class="sort-indicator" aria-hidden="true">--</span>
+                </button>
+              </th>
+              <th aria-sort="none">
+                <button class="sort-button" data-sort-key="surface" data-sort-label="Surface" type="button">
+                  <span>Surface</span>
+                  <span class="sort-indicator" aria-hidden="true">--</span>
+                </button>
+              </th>
+              <th aria-sort="none">
+                <button class="sort-button" data-sort-key="nli_entailment" data-sort-label="NLI E" type="button">
+                  <span>NLI E</span>
+                  <span class="sort-indicator" aria-hidden="true">--</span>
+                </button>
+              </th>
+              <th aria-sort="none">
+                <button class="sort-button" data-sort-key="nli_contradiction" data-sort-label="NLI C" type="button">
+                  <span>NLI C</span>
+                  <span class="sort-indicator" aria-hidden="true">--</span>
+                </button>
+              </th>
+              <th aria-sort="none">
+                <button class="sort-button" data-sort-key="response_excerpt" data-sort-label="Response excerpt" type="button">
+                  <span>Response excerpt</span>
+                  <span class="sort-indicator" aria-hidden="true">--</span>
+                </button>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+      <p class="empty" id="resultsEmpty" hidden>No evaluation rows match the current filters.</p>
+    </section>
+  </main>
+
+  <script>
+    const DATA_ROOT = "../data/latest";
+    const state = {
+      summary: null,
+      manifest: null,
+      leaderboard: [],
+      leaderboardRows: [],
+      articles: [],
+      results: [],
+      filteredResults: [],
+      selectedProvider: "all",
+      sortKey: "",
+      sortDirection: "descending",
+    };
+
+    const el = {
+      updatedPill: document.getElementById("updatedPill"),
+      topModelPill: document.getElementById("topModelPill"),
+      repairPill: document.getElementById("repairPill"),
+      snapshotMeta: document.getElementById("snapshotMeta"),
+      statsGrid: document.getElementById("statsGrid"),
+      leaderboardSummary: document.getElementById("leaderboardSummary"),
+      providerTabs: document.getElementById("providerTabs"),
+      leaderboardList: document.getElementById("leaderboardList"),
+      leaderboardEmpty: document.getElementById("leaderboardEmpty"),
+      modelFilter: document.getElementById("modelFilter"),
+      searchInput: document.getElementById("searchInput"),
+      resetFilters: document.getElementById("resetFilters"),
+      filterStatus: document.getElementById("filterStatus"),
+      articleGrid: document.getElementById("articleGrid"),
+      articleEmpty: document.getElementById("articleEmpty"),
+      resultsMeta: document.getElementById("resultsMeta"),
+      resultsBody: document.getElementById("resultsBody"),
+      resultsEmpty: document.getElementById("resultsEmpty"),
+      sortButtons: Array.from(document.querySelectorAll(".sort-button")),
+    };
+
+    const PROVIDER_ORDER = [
+      "all",
+      "openai",
+      "anthropic",
+      "perplexity",
+      "google",
+      "meta",
+      "deepseek",
+      "qwen",
+      "mistral",
+      "xai",
+      "other",
+    ];
+
+    const PROVIDER_INFO = {
+      all: { label: "All models", color: "#454036" },
+      openai: { label: "OpenAI", color: "#111827" },
+      anthropic: { label: "Anthropic", color: "#C26A16" },
+      perplexity: { label: "Perplexity", color: "#0E7490" },
+      google: { label: "Google", color: "#2563EB" },
+      meta: { label: "Meta", color: "#1D4ED8" },
+      deepseek: { label: "DeepSeek", color: "#0891B2" },
+      qwen: { label: "Qwen", color: "#7C3AED" },
+      mistral: { label: "Mistral", color: "#DB2777" },
+      xai: { label: "xAI", color: "#6D28D9" },
+      other: { label: "Other", color: "#625F59" },
+    };
+
+    const CORRECTED_STATUSES = new Set(["restored", "restored_with_explanation"]);
+    const FAKE_KEPT_STATUSES = new Set(["preserved_fake", "preserved_fake_with_explanation"]);
+    const SORT_DEFAULT_DIRECTION = {
+      article: "ascending",
+      model: "ascending",
+      overall: "descending",
+      repair: "descending",
+      status: "ascending",
+      surface: "descending",
+      nli_entailment: "descending",
+      nli_contradiction: "descending",
+      response_excerpt: "ascending",
+    };
+
+    function formatDate(value) {
+      if (!value) {
+        return "Unknown";
+      }
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        return value;
+      }
+      return new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(date);
+    }
+
+    function score(value, digits = 3) {
+      if (value === null || value === undefined || value === "") {
+        return "-";
+      }
+      const numeric = Number(value);
+      return Number.isFinite(numeric) ? numeric.toFixed(digits) : "-";
+    }
+
+    function percent(value, digits = 0) {
+      if (value === null || value === undefined || value === "") {
+        return "-";
+      }
+      const numeric = Number(value);
+      return Number.isFinite(numeric) ? `${(numeric * 100).toFixed(digits)}%` : "-";
+    }
+
+    function clampRate(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) {
+        return 0;
+      }
+      return Math.min(1, Math.max(0, numeric));
+    }
+
+    function providerInfo(provider) {
+      return PROVIDER_INFO[provider] || PROVIDER_INFO.other;
+    }
+
+    function inferProvider(modelName) {
+      const value = String(modelName || "").trim().toLowerCase();
+      if (!value) {
+        return "other";
+      }
+      if (value.includes(":")) {
+        const prefix = value.split(":", 1)[0];
+        if (Object.prototype.hasOwnProperty.call(PROVIDER_INFO, prefix) && prefix !== "all") {
+          return prefix;
+        }
+      }
+      if (value.startsWith("gpt-") || value.startsWith("o1") || value.startsWith("o3") || value.startsWith("o4")) {
+        return "openai";
+      }
+      if (value.startsWith("claude")) {
+        return "anthropic";
+      }
+      if (value.startsWith("sonar")) {
+        return "perplexity";
+      }
+      if (value.startsWith("gemini")) {
+        return "google";
+      }
+      if (value.startsWith("llama")) {
+        return "meta";
+      }
+      if (value.startsWith("deepseek")) {
+        return "deepseek";
+      }
+      if (value.startsWith("qwen")) {
+        return "qwen";
+      }
+      if (value.startsWith("mistral") || value.startsWith("mixtral")) {
+        return "mistral";
+      }
+      if (value.startsWith("grok")) {
+        return "xai";
+      }
+      return "other";
+    }
+
+    function prettyStatus(value) {
+      const labels = {
+        restored: "Restored",
+        restored_with_explanation: "Restored + note",
+        preserved_fake: "Fake kept",
+        preserved_fake_with_explanation: "Fake kept + note",
+        dropped_target: "Target dropped",
+        ambiguous_mixed: "Mixed",
+        not_applicable: "N/A",
+      };
+      return labels[value] || String(value || "-").replaceAll("_", " ");
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function safeUrl(value) {
+      try {
+        const url = new URL(String(value || ""), window.location.href);
+        if (url.protocol === "http:" || url.protocol === "https:") {
+          return url.href;
+        }
+      } catch (error) {
+      }
+      return "";
+    }
+
+    function normalizeSortText(value) {
+      return String(value ?? "").trim().toLowerCase();
+    }
+
+    function sortNumber(value) {
+      const numeric = Number(value);
+      return Number.isFinite(numeric) ? numeric : null;
+    }
+
+    function compareNumbers(left, right, direction) {
+      const leftMissing = left === null;
+      const rightMissing = right === null;
+      if (leftMissing || rightMissing) {
+        if (leftMissing && rightMissing) {
+          return 0;
+        }
+        return leftMissing ? 1 : -1;
+      }
+      return direction === "ascending" ? left - right : right - left;
+    }
+
+    function compareStrings(left, right, direction) {
+      const result = left.localeCompare(right, undefined, { sensitivity: "base" });
+      return direction === "ascending" ? result : -result;
+    }
+
+    function compareRows(left, right, direction, getter, kind = "text") {
+      if (kind === "number") {
+        const result = compareNumbers(sortNumber(getter(left)), sortNumber(getter(right)), direction);
+        if (result) {
+          return result;
+        }
+      } else {
+        const result = compareStrings(normalizeSortText(getter(left)), normalizeSortText(getter(right)), direction);
+        if (result) {
+          return result;
+        }
+      }
+      return Number(left._originalIndex || 0) - Number(right._originalIndex || 0);
+    }
+
+    function sortDefinition(sortKey) {
+      const definitions = {
+        article: {
+          kind: "text",
+          label: "Article",
+          getter: (row) => `${row.title || ""} ${row.source || ""} ${row.modification_type || ""}`,
+        },
+        model: {
+          kind: "text",
+          label: "Model",
+          getter: (row) => row.model,
+        },
+        overall: {
+          kind: "number",
+          label: "Overall",
+          getter: (row) => row.overall_score,
+        },
+        repair: {
+          kind: "number",
+          label: "Repair",
+          getter: (row) => (row.targeted_correction || {}).score,
+        },
+        status: {
+          kind: "text",
+          label: "Status",
+          getter: (row) => prettyStatus((row.targeted_correction || {}).status),
+        },
+        surface: {
+          kind: "number",
+          label: "Surface",
+          getter: (row) => row.surface_alignment_score ?? row.overall_score,
+        },
+        nli_entailment: {
+          kind: "number",
+          label: "NLI E",
+          getter: (row) => (row.nli_scores || {}).entailment,
+        },
+        nli_contradiction: {
+          kind: "number",
+          label: "NLI C",
+          getter: (row) => (row.nli_scores || {}).contradiction,
+        },
+        response_excerpt: {
+          kind: "text",
+          label: "Response excerpt",
+          getter: (row) => String(row.response_excerpt || "").replace(/<[^>]+>/g, " "),
+        },
+      };
+      return definitions[sortKey] || null;
+    }
+
+    function sortStatusLabel(direction) {
+      return direction === "ascending" ? "A-Z" : "Z-A";
+    }
+
+    function sortIndicatorLabel(sortKey, direction) {
+      const definition = sortDefinition(sortKey);
+      if (!definition) {
+        return "--";
+      }
+      if (definition.kind === "number") {
+        return direction === "ascending" ? "1-9" : "9-1";
+      }
+      return sortStatusLabel(direction);
+    }
+
+    function activeSortSummary() {
+      const definition = sortDefinition(state.sortKey);
+      if (!definition) {
+        return "";
+      }
+      const directionLabel = definition.kind === "number"
+        ? (state.sortDirection === "ascending" ? "low to high" : "high to low")
+        : (state.sortDirection === "ascending" ? "A to Z" : "Z to A");
+      return ` Sorted by ${definition.label} (${directionLabel}).`;
+    }
+
+    function sortResults(rows) {
+      const definition = sortDefinition(state.sortKey);
+      if (!definition) {
+        return [...rows];
+      }
+      return [...rows].sort((left, right) => compareRows(left, right, state.sortDirection, definition.getter, definition.kind));
+    }
+
+    function syncSortHeaders() {
+      el.sortButtons.forEach((button) => {
+        const sortKey = button.dataset.sortKey || "";
+        const isActive = sortKey === state.sortKey;
+        const direction = isActive ? state.sortDirection : "none";
+        const indicator = button.querySelector(".sort-indicator");
+        if (indicator) {
+          indicator.textContent = isActive ? sortIndicatorLabel(sortKey, state.sortDirection) : "--";
+        }
+        button.dataset.direction = direction;
+        button.setAttribute(
+          "aria-label",
+          isActive
+            ? `${button.dataset.sortLabel || sortKey}, sorted ${state.sortDirection}. Activate to reverse sort order.`
+            : `Sort by ${button.dataset.sortLabel || sortKey}.`
+        );
+        const headerCell = button.closest("th");
+        if (headerCell) {
+          headerCell.setAttribute("aria-sort", isActive ? state.sortDirection : "none");
+        }
+      });
+    }
+
+    function toggleSort(sortKey) {
+      if (!sortDefinition(sortKey)) {
+        return;
+      }
+      if (state.sortKey === sortKey) {
+        state.sortDirection = state.sortDirection === "ascending" ? "descending" : "ascending";
+      } else {
+        state.sortKey = sortKey;
+        state.sortDirection = SORT_DEFAULT_DIRECTION[sortKey] || "ascending";
+      }
+      applyFilters();
+    }
+
+    function localFileMessage() {
+      return "This viewer cannot read published snapshot files over file://. Serve the repo over http://localhost:8877 and reopen /viewer/index.html.";
+    }
+
+    async function fetchJson(path) {
+      const response = await fetch(path, { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error(`Could not load ${path}`);
+      }
+      return response.json();
+    }
+
+    async function fetchJsonl(path) {
+      const response = await fetch(path, { cache: "no-store" });
+      if (!response.ok) {
+        throw new Error(`Could not load ${path}`);
+      }
+      const text = await response.text();
+      return text
+        .split(/\n+/)
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => JSON.parse(line));
+    }
+
+    function buildLeaderboardRows(leaderboard, results) {
+      const outcomesByModel = new Map();
+
+      results.forEach((row) => {
+        const model = String(row.model || "").trim();
+        if (!model) {
+          return;
+        }
+        const current = outcomesByModel.get(model) || {
+          targetedCount: 0,
+          correctedCount: 0,
+          partialCount: 0,
+          preservedCount: 0,
+        };
+        const status = String((row.targeted_correction || {}).status || "").trim();
+        if (status) {
+          current.targetedCount += 1;
+          if (CORRECTED_STATUSES.has(status)) {
+            current.correctedCount += 1;
+          } else if (FAKE_KEPT_STATUSES.has(status)) {
+            current.preservedCount += 1;
+          } else {
+            current.partialCount += 1;
+          }
+        }
+        outcomesByModel.set(model, current);
+      });
+
+      return leaderboard
+        .map((row) => {
+          const provider = inferProvider(row.model);
+          const derived = outcomesByModel.get(row.model) || {
+            targetedCount: 0,
+            correctedCount: 0,
+            partialCount: 0,
+            preservedCount: 0,
+          };
+          const fallbackTargeted = Number(row.targeted_sample_count) || 0;
+          const targetedCount = Math.max(derived.targetedCount, fallbackTargeted);
+          let correctedCount = derived.correctedCount;
+          let partialCount = derived.partialCount;
+          let preservedCount = derived.preservedCount;
+
+          if (!derived.targetedCount && targetedCount) {
+            correctedCount = Math.round(clampRate(row.repair_rate) * targetedCount);
+            preservedCount = Math.round(clampRate(row.preserved_fake_rate) * targetedCount);
+            partialCount = Math.max(0, targetedCount - correctedCount - preservedCount);
+          }
+
+          const assignedCount = correctedCount + partialCount + preservedCount;
+          if (targetedCount && assignedCount < targetedCount) {
+            partialCount += targetedCount - assignedCount;
+          }
+
+          const correctedRate = targetedCount ? correctedCount / targetedCount : clampRate(row.repair_rate);
+          const preservedRate = targetedCount ? preservedCount / targetedCount : clampRate(row.preserved_fake_rate);
+          const partialRate = targetedCount
+            ? partialCount / targetedCount
+            : clampRate(row.dropped_target_rate ?? (1 - correctedRate - preservedRate));
+
+          return {
+            ...row,
+            provider,
+            targetedCount,
+            correctedCount,
+            partialCount,
+            preservedCount,
+            correctedRate,
+            partialRate: clampRate(partialRate),
+            preservedRate,
+          };
+        })
+        .sort(
+          (left, right) =>
+            Number(right.avg_overall_score || 0) - Number(left.avg_overall_score || 0)
+            || Number(right.evaluation_count || 0) - Number(left.evaluation_count || 0)
+            || String(left.model || "").localeCompare(String(right.model || ""))
+        );
+    }
+
+    function getVisibleLeaderboardRows() {
+      return state.leaderboardRows.filter(
+        (row) => state.selectedProvider === "all" || row.provider === state.selectedProvider
+      );
+    }
+
+    function summarizeLeaderboardMix(rows) {
+      let targetedCount = 0;
+      let correctedCount = 0;
+      let partialCount = 0;
+      let preservedCount = 0;
+
+      rows.forEach((row) => {
+        targetedCount += Number(row.targetedCount || 0);
+        correctedCount += Number(row.correctedCount || 0);
+        partialCount += Number(row.partialCount || 0);
+        preservedCount += Number(row.preservedCount || 0);
+      });
+
+      if (targetedCount) {
+        return {
+          targetedCount,
+          correctedRate: correctedCount / targetedCount,
+          partialRate: partialCount / targetedCount,
+          preservedRate: preservedCount / targetedCount,
+        };
+      }
+
+      const divisor = Math.max(1, rows.length);
+      return {
+        targetedCount: 0,
+        correctedRate: rows.reduce((sum, row) => sum + Number(row.correctedRate || 0), 0) / divisor,
+        partialRate: rows.reduce((sum, row) => sum + Number(row.partialRate || 0), 0) / divisor,
+        preservedRate: rows.reduce((sum, row) => sum + Number(row.preservedRate || 0), 0) / divisor,
+      };
+    }
+
+    function leaderboardTabs() {
+      const counts = state.leaderboardRows.reduce((accumulator, row) => {
+        accumulator[row.provider] = (accumulator[row.provider] || 0) + 1;
+        return accumulator;
+      }, {});
+
+      return PROVIDER_ORDER
+        .filter(
+          (provider) => provider === "all" || provider === "openai" || provider === "anthropic" || counts[provider]
+        )
+        .map((provider) => ({
+          provider,
+          count: provider === "all" ? state.leaderboardRows.length : counts[provider] || 0,
+          ...providerInfo(provider),
+        }));
+    }
+
+    function renderProviderTabs() {
+      const tabs = leaderboardTabs();
+      el.providerTabs.innerHTML = tabs
+        .map(
+          (tab) => `
+            <button
+              class="provider-tab${tab.provider === state.selectedProvider ? " is-active" : ""}${tab.count ? "" : " is-empty"}"
+              data-provider="${escapeHtml(tab.provider)}"
+              type="button"
+              aria-pressed="${tab.provider === state.selectedProvider ? "true" : "false"}"
+            >
+              <span class="provider-dot" style="background: ${tab.color};"></span>
+              <span>${escapeHtml(tab.label)}</span>
+              <span class="provider-count">${tab.count}</span>
+            </button>
+          `
+        )
+        .join("");
+    }
+
+    function renderLeaderboardSummary(rows) {
+      const scope = providerInfo(state.selectedProvider).label;
+      const mix = summarizeLeaderboardMix(rows);
+      const modelLabel = rows.length === 1 ? "model" : "models";
+      const rowLabel = mix.targetedCount === 1 ? "targeted row" : "targeted rows";
+
+      el.leaderboardSummary.innerHTML = [
+        `<span class="summary-pill scope"><strong>Scope:</strong> ${escapeHtml(scope)}</span>`,
+        `<span class="summary-pill corrected"><strong>${percent(mix.correctedRate, 0)}</strong> corrected</span>`,
+        `<span class="summary-pill partial"><strong>${percent(mix.partialRate, 0)}</strong> partial</span>`,
+        `<span class="summary-pill fake-kept"><strong>${percent(mix.preservedRate, 0)}</strong> fake kept</span>`,
+        `<span class="summary-pill"><strong>${rows.length}</strong> ${modelLabel}</span>`,
+        `<span class="summary-pill"><strong>${mix.targetedCount}</strong> ${rowLabel}</span>`,
+      ].join("");
+    }
+
+    function renderLeaderboardSegments(row) {
+      const segments = [
+        ["corrected", row.correctedRate],
+        ["partial", row.partialRate],
+        ["fake-kept", row.preservedRate],
+      ];
+
+      return segments
+        .filter(([, value]) => value > 0)
+        .map(([tone, value]) => {
+          const label = percent(value, value > 0 && value < 0.1 ? 1 : 0);
+          const text = value >= 0.08 ? `<span>${label}</span>` : "";
+          return `<div class="leaderboard-segment ${tone}" style="width: ${(value * 100).toFixed(2)}%;">${text}</div>`;
+        })
+        .join("");
+    }
+
+    function setError(message) {
+      el.snapshotMeta.textContent = message;
+      el.filterStatus.textContent = message;
+      el.filterStatus.classList.add("error");
+      el.updatedPill.textContent = "No published snapshot found";
+      el.topModelPill.textContent = "Publish data/latest to populate this page";
+      el.repairPill.textContent = "Repair metrics unavailable";
+      el.statsGrid.innerHTML = `<p class="status error">${message}</p>`;
+      el.leaderboardSummary.innerHTML = "";
+      el.providerTabs.innerHTML = "";
+      el.leaderboardList.innerHTML = "";
+      el.leaderboardEmpty.hidden = false;
+      el.articleEmpty.hidden = false;
+      el.resultsEmpty.hidden = false;
+      el.resultsMeta.textContent = message;
+    }
+
+    function renderStats() {
+      const summary = state.summary;
+      const stats = [
+        ["Articles", summary?.article_count ?? 0],
+        ["Evaluations", summary?.evaluation_count ?? 0],
+        ["Models", summary?.model_count ?? 0],
+        ["Sources", summary?.source_count ?? 0],
+        ["Repairable", summary?.repairable_result_count ?? 0],
+        ["Avg repair", percent(summary?.avg_targeted_correction_score, 0)],
+      ];
+      el.statsGrid.innerHTML = stats
+        .map(
+          ([label, value]) => `
+            <article class="stat-card">
+              <div class="meta">${label}</div>
+              <strong>${value}</strong>
+            </article>
+          `
+        )
+        .join("");
+    }
+
+    function renderLeaderboard() {
+      renderProviderTabs();
+      const rows = getVisibleLeaderboardRows();
+      renderLeaderboardSummary(rows);
+
+      if (!state.leaderboardRows.length) {
+        el.leaderboardList.innerHTML = "";
+        el.leaderboardEmpty.hidden = false;
+        return;
+      }
+
+      if (!rows.length) {
+        el.leaderboardList.innerHTML = "";
+        el.leaderboardEmpty.hidden = false;
+        el.leaderboardEmpty.textContent = `No published ${providerInfo(state.selectedProvider).label} rows yet.`;
+        return;
+      }
+
+      el.leaderboardEmpty.hidden = true;
+      el.leaderboardEmpty.textContent = "No published leaderboard rows yet.";
+      el.leaderboardList.innerHTML = rows
+        .map((row, index) => {
+          const provider = providerInfo(row.provider);
+          const barSummary = `${percent(row.correctedRate, 0)} corrected, ${percent(row.partialRate, 0)} partial, ${percent(row.preservedRate, 0)} fake kept`;
+          return `
+            <article class="leaderboard-row">
+              <div class="leaderboard-rank">${index + 1}</div>
+              <div class="leaderboard-model">
+                <div class="leaderboard-name">
+                  <span class="provider-dot" style="background: ${provider.color};"></span>
+                  <h3>${escapeHtml(row.model)}</h3>
+                  <span class="provider-badge">${escapeHtml(provider.label)}</span>
+                </div>
+                <div class="leaderboard-metrics">
+                  <span class="metric-pill"><strong>Repair</strong> ${percent(row.avg_targeted_correction_score, 0)}</span>
+                  <span class="metric-pill"><strong>Surface</strong> ${score(row.avg_surface_alignment_score)}</span>
+                  <span class="metric-pill"><strong>Evaluations</strong> ${row.evaluation_count}</span>
+                </div>
+              </div>
+              <div class="leaderboard-bar-panel">
+                <div class="leaderboard-bar" role="img" aria-label="${escapeHtml(row.model)} outcome mix: ${escapeHtml(barSummary)}">
+                  ${renderLeaderboardSegments(row)}
+                </div>
+                <p class="leaderboard-caption">${barSummary}</p>
+              </div>
+              <div class="leaderboard-score">
+                <span>Benchmark score</span>
+                <strong>${score(row.avg_overall_score)}</strong>
+                <span>${row.targetedCount || 0} targeted rows</span>
+              </div>
+            </article>
+          `;
+        })
+        .join("");
+    }
+
+    function stripParagraphs(text) {
+      if (!text) return "";
+      return String(text)
+        .replace(/<\/p>/gi, "\n")
+        .replace(/<[^>]+>/g, "")
+        .trim();
+    }
+
+    function highlightModification(text, originalEntity, modifiedEntity) {
+      if (!text) return "";
+      let escaped = escapeHtml(text);
+      
+      if (originalEntity) {
+        const escapedOriginal = escapeHtml(originalEntity);
+        const regexOriginal = new RegExp(`(${escapedOriginal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        escaped = escaped.replace(regexOriginal, '<span class="highlight-original">$1</span>');
+      }
+      
+      if (modifiedEntity) {
+        const escapedModified = escapeHtml(modifiedEntity);
+        const regexModified = new RegExp(`(${escapedModified.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        escaped = escaped.replace(regexModified, '<span class="highlight">$1</span>');
+      }
+      
+      return escaped;
+    }
+
+    const FEATURED_ARTICLE_LIMIT = 4;
+    const REVEAL_DEFAULT_WIDTH = "58%";
+
+    function articleTimestamp(article) {
+      const raw = article?.published_date || article?.created_at;
+      const time = raw ? Date.parse(raw) : 0;
+      return Number.isFinite(time) ? time : 0;
+    }
+
+    function getModificationMeta(modificationType) {
+      const normalized = String(modificationType || "").toLowerCase();
+      if (normalized === "entity") {
+        return null;
+      }
+      return {
+        className: "muted",
+        label: normalized ? normalized.replace(/_/g, " ") : "Unknown change",
+      };
+    }
+
+    function getFeaturedArticles(articles) {
+      return [...articles]
+        .sort((left, right) => articleTimestamp(right) - articleTimestamp(left))
+        .slice(0, FEATURED_ARTICLE_LIMIT);
+    }
+
+    function renderArticles() {
+      if (!state.articles.length) {
+        el.articleGrid.innerHTML = "";
+        el.articleEmpty.hidden = false;
+        return;
+      }
+      el.articleEmpty.hidden = true;
+      const featuredArticles = getFeaturedArticles(state.articles);
+      el.articleGrid.innerHTML = featuredArticles.map((article, index) => {
+        const safeLink = safeUrl(article.url);
+        const modificationMeta = getModificationMeta(article.modification_type);
+        const badges = [
+          `<span class="tag">${escapeHtml(article.source || "Unknown source")}</span>`,
+          modificationMeta ? `<span class="tag ${modificationMeta.className}">${escapeHtml(modificationMeta.label)}</span>` : "",
+        ].join("");
+        const titleMarkup = safeLink
+          ? `<a class="article-title-link" href="${safeLink}" target="_blank" rel="noreferrer">${escapeHtml(article.title)}</a>`
+          : escapeHtml(article.title);
+        const injectedEdit = article.original_entity && article.modified_entity
+          ? `<p class="entity-change"><span class="entity-chip previous">${escapeHtml(article.original_entity)}</span><span class="entity-arrow" aria-hidden="true">→</span><span class="entity-chip updated">${escapeHtml(article.modified_entity)}</span></p>`
+          : "";
+        const sliderId = `revealSlider${index}`;
+        const originalText = stripParagraphs(article.content);
+        const modifiedText = stripParagraphs(article.modified_content);
+        const highlightedOriginal = highlightModification(originalText, article.original_entity, null);
+        const highlightedModified = highlightModification(modifiedText, article.original_entity, article.modified_entity);
+        return `
+          <article class="article-card">
+            <div class="article-card-header">
+              <h3>${titleMarkup}</h3>
+              <p class="meta">Published ${formatDate(article.published_date || article.created_at)}</p>
+            </div>
+            <div class="tag-row">${badges}</div>
+            ${injectedEdit}
+            <div class="reveal-container">
+              <div class="reveal-slider" id="${sliderId}">
+                <div class="reveal-original">
+                  ${highlightedOriginal || "No original content stored."}
+                </div>
+                <div class="reveal-modified">
+                  ${highlightedModified || "No modified content stored."}
+                </div>
+                <div class="reveal-handle"></div>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("");
+
+      featuredArticles.forEach((_, index) => {
+        const slider = document.getElementById(`revealSlider${index}`);
+        if (slider) {
+          function updateReveal(event) {
+            const rect = slider.getBoundingClientRect();
+            const x = Math.max(0, Math.min(event.clientX - rect.left, rect.width));
+            const percent = (x / rect.width) * 100;
+            slider.style.setProperty("--reveal-width", `${percent}%`);
+          }
+          slider.addEventListener("pointerdown", updateReveal);
+          slider.addEventListener("pointermove", updateReveal);
+          slider.addEventListener("pointerleave", () => {
+            slider.style.setProperty("--reveal-width", REVEAL_DEFAULT_WIDTH);
+          });
+        }
+      });
+    }
+
+    function renderResults() {
+      if (!state.filteredResults.length) {
+        el.resultsBody.innerHTML = "";
+        el.resultsEmpty.hidden = false;
+        el.resultsMeta.textContent = "No published rows match the active filters.";
+        syncSortHeaders();
+        return;
+      }
+      el.resultsEmpty.hidden = true;
+      el.resultsMeta.textContent = `Showing ${state.filteredResults.length} published evaluation rows.${activeSortSummary()}`;
+      el.resultsBody.innerHTML = state.filteredResults
+        .map((row) => {
+          const targeted = row.targeted_correction || {};
+          return `
+            <tr>
+              <td>
+                <strong>${escapeHtml(row.title)}</strong><br>
+                <span class="meta">${escapeHtml(row.source)} · ${escapeHtml(row.modification_type || "unknown modification")}</span>
+              </td>
+              <td>${escapeHtml(row.model)}</td>
+              <td class="score">${score(row.overall_score)}</td>
+              <td>${percent(targeted.score, 0)}</td>
+              <td>${escapeHtml(prettyStatus(targeted.status))}</td>
+              <td>${score(row.surface_alignment_score ?? row.overall_score)}</td>
+              <td>${score((row.nli_scores || {}).entailment, 2)}</td>
+              <td>${score((row.nli_scores || {}).contradiction, 2)}</td>
+              <td>${escapeHtml(row.response_excerpt || "")}</td>
+            </tr>
+          `;
+        })
+        .join("");
+      syncSortHeaders();
+    }
+
+    function hydrateFilters() {
+      const options = ["<option value=\"all\">All models</option>"]
+        .concat(state.summary.available_models.map((model) => `<option value="${escapeHtml(model)}">${escapeHtml(model)}</option>`));
+      el.modelFilter.innerHTML = options.join("");
+    }
+
+    function applyFilters() {
+      const model = el.modelFilter.value;
+      const query = el.searchInput.value.trim().toLowerCase();
+      const filtered = state.results.filter((row) => {
+        const matchesModel = model === "all" || row.model === model;
+        const haystack = `${row.title} ${row.source} ${row.model}`.toLowerCase();
+        const matchesQuery = !query || haystack.includes(query);
+        return matchesModel && matchesQuery;
+      });
+      state.filteredResults = sortResults(filtered);
+      el.filterStatus.textContent = state.filteredResults.length === state.results.length
+        ? `Showing all published rows.${activeSortSummary()}`
+        : `Showing ${state.filteredResults.length} of ${state.results.length} published rows.${activeSortSummary()}`;
+      el.filterStatus.classList.remove("error");
+      renderResults();
+    }
+
+    async function boot() {
+      if (window.location.protocol === "file:") {
+        setError(localFileMessage());
+        return;
+      }
+
+      try {
+        const [manifest, summary, leaderboard, articles, results] = await Promise.all([
+          fetchJson(`${DATA_ROOT}/manifest.json`),
+          fetchJson(`${DATA_ROOT}/summary.json`),
+          fetchJson(`${DATA_ROOT}/leaderboard.json`),
+          fetchJson(`${DATA_ROOT}/articles.json`),
+          fetchJsonl(`${DATA_ROOT}/results.jsonl`),
+        ]);
+
+        state.manifest = manifest;
+        state.summary = summary;
+        state.leaderboard = leaderboard;
+        state.leaderboardRows = buildLeaderboardRows(leaderboard, results);
+        state.articles = articles;
+        state.results = results.map((row, index) => ({ ...row, _originalIndex: index }));
+        state.filteredResults = [...state.results];
+
+        el.updatedPill.textContent = `Published ${formatDate(summary.generated_at_utc)}`;
+        el.topModelPill.textContent = summary.top_model || "Top model pending";
+        el.repairPill.textContent = summary.best_repair_model || "Repair signal pending";
+        const runLabel = summary.latest_run_id ? `run ${summary.latest_run_id}` : "run id unavailable";
+        el.snapshotMeta.textContent = `${manifest.counts.articles} articles, ${manifest.counts.results} results, ${runLabel}, publish mode ${manifest.publish_mode}, avg repair ${percent(summary.avg_targeted_correction_score, 0)}.`;
+
+        renderStats();
+        renderLeaderboard();
+        renderArticles();
+        hydrateFilters();
+        applyFilters();
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "Could not load published viewer data.");
+      }
+    }
+
+    el.modelFilter.addEventListener("change", applyFilters);
+    el.searchInput.addEventListener("input", applyFilters);
+    el.sortButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        toggleSort(button.dataset.sortKey || "");
+      });
+    });
+    el.providerTabs.addEventListener("click", (event) => {
+      if (!(event.target instanceof Element)) {
+        return;
+      }
+      const button = event.target.closest("button[data-provider]");
+      if (!button) {
+        return;
+      }
+      state.selectedProvider = button.dataset.provider || "all";
+      renderLeaderboard();
+    });
+    el.resetFilters.addEventListener("click", () => {
+      el.modelFilter.value = "all";
+      el.searchInput.value = "";
+      applyFilters();
+    });
+
+    const demoSlider = document.getElementById("demoSlider");
+    if (demoSlider) {
+      function updateReveal(event) {
+        const rect = demoSlider.getBoundingClientRect();
+        const x = Math.max(0, Math.min(event.clientX - rect.left, rect.width));
+        const percent = (x / rect.width) * 100;
+        demoSlider.style.setProperty("--reveal-width", `${percent}%`);
+      }
+      demoSlider.addEventListener("mousemove", updateReveal);
+      demoSlider.addEventListener("mouseleave", () => {
+        demoSlider.style.setProperty("--reveal-width", "100%");
+      });
+    }
+
+    boot();
+  </script>
+</body>
+</html>

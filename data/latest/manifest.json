@@ -1,0 +1,16 @@
+{
+  "generated_at_utc": "2026-03-08T17:10:00Z",
+  "publish_mode": "supplemental",
+  "latest_run_id": "",
+  "counts": {
+    "articles": 30,
+    "results": 120,
+    "models": 4
+  },
+  "exports": {
+    "summary": "summary.json",
+    "leaderboard": "leaderboard.json",
+    "articles": "articles.json",
+    "results": "results.jsonl"
+  }
+}

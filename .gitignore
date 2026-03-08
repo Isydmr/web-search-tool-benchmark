@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.env
+runs/
+output/
+site/
+data/tmp/
+*.db
+*.db.bak
+.DS_Store
